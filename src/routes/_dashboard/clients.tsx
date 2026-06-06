@@ -152,7 +152,7 @@ function ClientsPage() {
               </div>
               <DialogFooter className="pt-4 gap-2">
                 <Button type="button" variant="ghost" onClick={() => setIsAddDialogOpen(false)} className="text-[#69707a] font-bold text-xs uppercase">Cancel</Button>
-                <Button type="submit" className="bg-[#0061f2] hover:bg-[#0052ce] text-white font-bold text-xs uppercase px-8">Create Account</Button>
+                <Button type="submit" disabled={submitting} className="bg-[#0061f2] hover:bg-[#0052ce] text-white font-bold text-xs uppercase px-8">{submitting ? "Creating..." : "Create Account"}</Button>
               </DialogFooter>
             </form>
           </DialogContent>
