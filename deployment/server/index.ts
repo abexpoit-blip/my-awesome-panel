@@ -56,7 +56,10 @@ app.post('/auth/login', async (c) => {
 });
 
 // Protected Data Proxy
-app.use('/api/*', jwt({ secret: JWT_SECRET, alg: 'HS256' } as any));
+app.use('/api/*', (c, next) => {
+  const handler = jwt({ secret: JWT_SECRET, alg: 'HS256' } as any);
+  return handler(c, next);
+});
 
 
 
