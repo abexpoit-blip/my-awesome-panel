@@ -7,7 +7,7 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 # Use npm install to generate local binaries
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps && npm install -g vite
 
 COPY . .
 
