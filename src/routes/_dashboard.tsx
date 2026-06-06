@@ -39,36 +39,67 @@ function DashboardLayout() {
   const [isSmsModuleOpen, setIsSmsModuleOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [impersonatedAgent, setImpersonatedAgent] = useState<any>(null);
   const [activeRates, setActiveRates] = useState<any[]>([]);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate({ to: "/login" });
-        return;
-      }
-      
-      const { data: profile } = await supabase
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate({ to: "/login" });
+      return;
+    }
+    
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+    
+    setProfile(profile);
+
+    // Impersonation check
+    const impersonatedId = sessionStorage.getItem('impersonated_agent_id');
+    if (impersonatedId && profile?.is_admin) {
+      const { data: agent } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('id', impersonatedId)
         .single();
-      
-      setProfile(profile);
+      if (agent) {
+        setImpersonatedAgent(agent);
+      }
+    } else {
+      setImpersonatedAgent(null);
+    }
 
-      // Fetch active rates
-      const { data: rates } = await supabase
-        .from('active_rates')
-        .select('*')
-        .order('created_at', { ascending: true });
-      if (rates) setActiveRates(rates);
-    };
+    // Fetch active rates
+    const { data: rates } = await supabase
+      .from('active_rates')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (rates) setActiveRates(rates);
+  };
+
+  useEffect(() => {
     checkUser();
   }, [navigate]);
+
+  // Listen for storage changes (impersonation)
+  useEffect(() => {
+    const handleStorageChange = () => checkUser();
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const handleExitImpersonation = () => {
+    sessionStorage.removeItem('impersonated_agent_id');
+    setImpersonatedAgent(null);
+    toast.success("Returned to Admin Panel");
+    navigate({ to: "/admin" });
+  };
 
   const menuItems = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
@@ -102,7 +133,7 @@ function DashboardLayout() {
     { label: "Credit Notes", icon: FileText, href: "/credits" },
     { label: "News", icon: Newspaper, href: "/news" },
     { label: "SMS Test Panel", icon: Settings, href: "/test-panel" },
-    ...(profile?.is_admin ? [{ label: "Admin Panel", icon: ShieldCheck, href: "/admin" }] : []),
+    ...(profile?.is_admin && !impersonatedAgent ? [{ label: "Admin Panel", icon: ShieldCheck, href: "/admin" }] : []),
   ];
 
   return (
