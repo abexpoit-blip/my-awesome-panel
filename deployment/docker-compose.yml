@@ -42,6 +42,8 @@ services:
     environment:
       - VITE_SELF_HOSTED=true
       - VITE_API_URL=https://panel.nexus-x.site/api
+      - PORT=3000
+      - HOST=0.0.0.0
     depends_on:
       - api
     networks:
@@ -54,7 +56,6 @@ services:
       - "80:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ../dist/client:/usr/share/nginx/html:ro
     depends_on:
       - frontend
       - api
