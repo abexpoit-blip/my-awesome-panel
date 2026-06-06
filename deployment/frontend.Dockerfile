@@ -3,7 +3,7 @@ WORKDIR /app
 
 # Enable Nitro node-server preset to ensure .output is created
 ENV NITRO_PRESET=node-server
-ENV NODE_ENV=production
+# NODE_ENV is set to production later for the runner stage
 
 COPY package*.json ./
 # Use npm install to generate local binaries
