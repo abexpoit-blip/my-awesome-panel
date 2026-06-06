@@ -95,7 +95,11 @@ function DashboardLayout() {
           <span className="text-3xl font-bold italic tracking-tighter text-[#2b3a4a] ml-4">iMS</span>
         </div>
         
-        <nav className="flex-1 py-4 overflow-y-auto">
+        <nav className="flex-1 py-4 overflow-y-auto custom-scrollbar">
+          <div className="px-4 mb-2">
+            <p className="text-[10px] font-bold text-[#69707a] uppercase tracking-wider">Navigation Menu</p>
+          </div>
+
           {menuItems.map((item) => (
             <div key={item.label}>
               {item.hasSubmenu ? (
