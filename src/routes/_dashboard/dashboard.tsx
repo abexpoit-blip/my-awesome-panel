@@ -34,11 +34,12 @@ const data = [
 
 function DashboardPage() {
   const stats = [
-    { label: "TODAY SMS", value: "431", color: "bg-blue-500" },
-    { label: "YESTERDAY SMS", value: "402", color: "bg-red-500" },
-    { label: "Last 7 Days", value: "3091", color: "bg-emerald-500" },
-    { label: "Money This Month", value: "54.45", color: "bg-orange-500", prefix: "$" },
+    { label: "TODAY SMS", value: "431", color: "bg-[#0061f2]" },
+    { label: "YESTERDAY SMS", value: "402", color: "bg-[#e81500]" },
+    { label: "Last 7 Days", value: "3091", color: "bg-[#00ac69]" },
+    { label: "Money This Month", value: "54.45", color: "bg-[#f4a100]", prefix: "$" },
   ];
+
 
   return (
     <div className="space-y-6">
