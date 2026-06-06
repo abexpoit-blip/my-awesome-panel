@@ -16,7 +16,9 @@ import {
   Bell,
   Maximize,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  UserCheck,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 
 export const Route = createFileRoute("/_dashboard")({
