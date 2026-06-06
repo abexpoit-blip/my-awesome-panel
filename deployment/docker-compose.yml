@@ -35,15 +35,16 @@ services:
       - nexus_network
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: ..
+      dockerfile: ./deployment/frontend.Dockerfile
     container_name: nexus_nginx
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ../dist:/usr/share/nginx/html
+    environment:
+      - VITE_SELF_HOSTED=true
+      - VITE_API_URL=https://ap2.nexus-x.site/api
     depends_on:
       - api
     networks:
