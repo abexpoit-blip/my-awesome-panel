@@ -13,9 +13,19 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardTestPanelRouteImport } from './routes/_dashboard/test-panel'
+import { Route as DashboardNewsRouteImport } from './routes/_dashboard/news'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
+import { Route as DashboardCreditsRouteImport } from './routes/_dashboard/credits'
 import { Route as DashboardClientsRouteImport } from './routes/_dashboard/clients'
+import { Route as DashboardStatsSmsRouteImport } from './routes/_dashboard/stats/sms'
+import { Route as DashboardStatsRangeRouteImport } from './routes/_dashboard/stats/range'
+import { Route as DashboardStatsNumberRouteImport } from './routes/_dashboard/stats/number'
+import { Route as DashboardStatsClientRouteImport } from './routes/_dashboard/stats/client'
+import { Route as DashboardStatsCdrRouteImport } from './routes/_dashboard/stats/cdr'
+import { Route as DashboardSmsRatecardRouteImport } from './routes/_dashboard/sms/ratecard'
 import { Route as DashboardSmsRangesRouteImport } from './routes/_dashboard/sms/ranges'
+import { Route as DashboardSmsNumbersRouteImport } from './routes/_dashboard/sms/numbers'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -36,9 +46,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardTestPanelRoute = DashboardTestPanelRouteImport.update({
+  id: '/test-panel',
+  path: '/test-panel',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardNewsRoute = DashboardNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCreditsRoute = DashboardCreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardClientsRoute = DashboardClientsRouteImport.update({
@@ -46,9 +71,44 @@ const DashboardClientsRoute = DashboardClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardStatsSmsRoute = DashboardStatsSmsRouteImport.update({
+  id: '/stats/sms',
+  path: '/stats/sms',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStatsRangeRoute = DashboardStatsRangeRouteImport.update({
+  id: '/stats/range',
+  path: '/stats/range',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStatsNumberRoute = DashboardStatsNumberRouteImport.update({
+  id: '/stats/number',
+  path: '/stats/number',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStatsClientRoute = DashboardStatsClientRouteImport.update({
+  id: '/stats/client',
+  path: '/stats/client',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStatsCdrRoute = DashboardStatsCdrRouteImport.update({
+  id: '/stats/cdr',
+  path: '/stats/cdr',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSmsRatecardRoute = DashboardSmsRatecardRouteImport.update({
+  id: '/sms/ratecard',
+  path: '/sms/ratecard',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSmsRangesRoute = DashboardSmsRangesRouteImport.update({
   id: '/sms/ranges',
   path: '/sms/ranges',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSmsNumbersRoute = DashboardSmsNumbersRouteImport.update({
+  id: '/sms/numbers',
+  path: '/sms/numbers',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -57,16 +117,36 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/clients': typeof DashboardClientsRoute
+  '/credits': typeof DashboardCreditsRoute
   '/dashboard': typeof DashboardDashboardRoute
+  '/news': typeof DashboardNewsRoute
+  '/test-panel': typeof DashboardTestPanelRoute
+  '/sms/numbers': typeof DashboardSmsNumbersRoute
   '/sms/ranges': typeof DashboardSmsRangesRoute
+  '/sms/ratecard': typeof DashboardSmsRatecardRoute
+  '/stats/cdr': typeof DashboardStatsCdrRoute
+  '/stats/client': typeof DashboardStatsClientRoute
+  '/stats/number': typeof DashboardStatsNumberRoute
+  '/stats/range': typeof DashboardStatsRangeRoute
+  '/stats/sms': typeof DashboardStatsSmsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/clients': typeof DashboardClientsRoute
+  '/credits': typeof DashboardCreditsRoute
   '/dashboard': typeof DashboardDashboardRoute
+  '/news': typeof DashboardNewsRoute
+  '/test-panel': typeof DashboardTestPanelRoute
+  '/sms/numbers': typeof DashboardSmsNumbersRoute
   '/sms/ranges': typeof DashboardSmsRangesRoute
+  '/sms/ratecard': typeof DashboardSmsRatecardRoute
+  '/stats/cdr': typeof DashboardStatsCdrRoute
+  '/stats/client': typeof DashboardStatsClientRoute
+  '/stats/number': typeof DashboardStatsNumberRoute
+  '/stats/range': typeof DashboardStatsRangeRoute
+  '/stats/sms': typeof DashboardStatsSmsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -75,8 +155,18 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_dashboard/clients': typeof DashboardClientsRoute
+  '/_dashboard/credits': typeof DashboardCreditsRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRoute
+  '/_dashboard/news': typeof DashboardNewsRoute
+  '/_dashboard/test-panel': typeof DashboardTestPanelRoute
+  '/_dashboard/sms/numbers': typeof DashboardSmsNumbersRoute
   '/_dashboard/sms/ranges': typeof DashboardSmsRangesRoute
+  '/_dashboard/sms/ratecard': typeof DashboardSmsRatecardRoute
+  '/_dashboard/stats/cdr': typeof DashboardStatsCdrRoute
+  '/_dashboard/stats/client': typeof DashboardStatsClientRoute
+  '/_dashboard/stats/number': typeof DashboardStatsNumberRoute
+  '/_dashboard/stats/range': typeof DashboardStatsRangeRoute
+  '/_dashboard/stats/sms': typeof DashboardStatsSmsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -85,10 +175,36 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/clients'
+    | '/credits'
     | '/dashboard'
+    | '/news'
+    | '/test-panel'
+    | '/sms/numbers'
     | '/sms/ranges'
+    | '/sms/ratecard'
+    | '/stats/cdr'
+    | '/stats/client'
+    | '/stats/number'
+    | '/stats/range'
+    | '/stats/sms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/clients' | '/dashboard' | '/sms/ranges'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/clients'
+    | '/credits'
+    | '/dashboard'
+    | '/news'
+    | '/test-panel'
+    | '/sms/numbers'
+    | '/sms/ranges'
+    | '/sms/ratecard'
+    | '/stats/cdr'
+    | '/stats/client'
+    | '/stats/number'
+    | '/stats/range'
+    | '/stats/sms'
   id:
     | '__root__'
     | '/'
@@ -96,8 +212,18 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/_dashboard/clients'
+    | '/_dashboard/credits'
     | '/_dashboard/dashboard'
+    | '/_dashboard/news'
+    | '/_dashboard/test-panel'
+    | '/_dashboard/sms/numbers'
     | '/_dashboard/sms/ranges'
+    | '/_dashboard/sms/ratecard'
+    | '/_dashboard/stats/cdr'
+    | '/_dashboard/stats/client'
+    | '/_dashboard/stats/number'
+    | '/_dashboard/stats/range'
+    | '/_dashboard/stats/sms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -137,11 +263,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_dashboard/test-panel': {
+      id: '/_dashboard/test-panel'
+      path: '/test-panel'
+      fullPath: '/test-panel'
+      preLoaderRoute: typeof DashboardTestPanelRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/news': {
+      id: '/_dashboard/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof DashboardNewsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/dashboard': {
       id: '/_dashboard/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardDashboardRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/credits': {
+      id: '/_dashboard/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof DashboardCreditsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/clients': {
@@ -151,6 +298,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardClientsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/stats/sms': {
+      id: '/_dashboard/stats/sms'
+      path: '/stats/sms'
+      fullPath: '/stats/sms'
+      preLoaderRoute: typeof DashboardStatsSmsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stats/range': {
+      id: '/_dashboard/stats/range'
+      path: '/stats/range'
+      fullPath: '/stats/range'
+      preLoaderRoute: typeof DashboardStatsRangeRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stats/number': {
+      id: '/_dashboard/stats/number'
+      path: '/stats/number'
+      fullPath: '/stats/number'
+      preLoaderRoute: typeof DashboardStatsNumberRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stats/client': {
+      id: '/_dashboard/stats/client'
+      path: '/stats/client'
+      fullPath: '/stats/client'
+      preLoaderRoute: typeof DashboardStatsClientRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stats/cdr': {
+      id: '/_dashboard/stats/cdr'
+      path: '/stats/cdr'
+      fullPath: '/stats/cdr'
+      preLoaderRoute: typeof DashboardStatsCdrRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/sms/ratecard': {
+      id: '/_dashboard/sms/ratecard'
+      path: '/sms/ratecard'
+      fullPath: '/sms/ratecard'
+      preLoaderRoute: typeof DashboardSmsRatecardRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/sms/ranges': {
       id: '/_dashboard/sms/ranges'
       path: '/sms/ranges'
@@ -158,19 +347,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSmsRangesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/sms/numbers': {
+      id: '/_dashboard/sms/numbers'
+      path: '/sms/numbers'
+      fullPath: '/sms/numbers'
+      preLoaderRoute: typeof DashboardSmsNumbersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
 interface DashboardRouteChildren {
   DashboardClientsRoute: typeof DashboardClientsRoute
+  DashboardCreditsRoute: typeof DashboardCreditsRoute
   DashboardDashboardRoute: typeof DashboardDashboardRoute
+  DashboardNewsRoute: typeof DashboardNewsRoute
+  DashboardTestPanelRoute: typeof DashboardTestPanelRoute
+  DashboardSmsNumbersRoute: typeof DashboardSmsNumbersRoute
   DashboardSmsRangesRoute: typeof DashboardSmsRangesRoute
+  DashboardSmsRatecardRoute: typeof DashboardSmsRatecardRoute
+  DashboardStatsCdrRoute: typeof DashboardStatsCdrRoute
+  DashboardStatsClientRoute: typeof DashboardStatsClientRoute
+  DashboardStatsNumberRoute: typeof DashboardStatsNumberRoute
+  DashboardStatsRangeRoute: typeof DashboardStatsRangeRoute
+  DashboardStatsSmsRoute: typeof DashboardStatsSmsRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardClientsRoute: DashboardClientsRoute,
+  DashboardCreditsRoute: DashboardCreditsRoute,
   DashboardDashboardRoute: DashboardDashboardRoute,
+  DashboardNewsRoute: DashboardNewsRoute,
+  DashboardTestPanelRoute: DashboardTestPanelRoute,
+  DashboardSmsNumbersRoute: DashboardSmsNumbersRoute,
   DashboardSmsRangesRoute: DashboardSmsRangesRoute,
+  DashboardSmsRatecardRoute: DashboardSmsRatecardRoute,
+  DashboardStatsCdrRoute: DashboardStatsCdrRoute,
+  DashboardStatsClientRoute: DashboardStatsClientRoute,
+  DashboardStatsNumberRoute: DashboardStatsNumberRoute,
+  DashboardStatsRangeRoute: DashboardStatsRangeRoute,
+  DashboardStatsSmsRoute: DashboardStatsSmsRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
@@ -186,13 +402,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

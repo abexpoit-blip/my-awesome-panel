@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_rates: {
+        Row: {
+          country: string
+          created_at: string | null
+          id: string
+          provider: string
+          rate: number
+          type: string
+        }
+        Insert: {
+          country: string
+          created_at?: string | null
+          id?: string
+          provider: string
+          rate: number
+          type: string
+        }
+        Update: {
+          country?: string
+          created_at?: string | null
+          id?: string
+          provider?: string
+          rate?: number
+          type?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           agent_id: string | null
@@ -82,6 +109,57 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_cdr: {
+        Row: {
+          agent_id: string | null
+          client_id: string | null
+          id: string
+          message: string | null
+          number: string
+          payout: number | null
+          prefix: string | null
+          received_at: string | null
+          status: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          client_id?: string | null
+          id?: string
+          message?: string | null
+          number: string
+          payout?: number | null
+          prefix?: string | null
+          received_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          client_id?: string | null
+          id?: string
+          message?: string | null
+          number?: string
+          payout?: number | null
+          prefix?: string | null
+          received_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_cdr_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_cdr_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sms_logs: {
         Row: {
           agent_id: string | null
@@ -136,6 +214,7 @@ export type Database = {
           currency: string | null
           id: string
           memo: string | null
+          name: string | null
           payout_1_1: number | null
           payout_30_45: number | null
           payout_7_1: number | null
@@ -148,6 +227,7 @@ export type Database = {
           currency?: string | null
           id?: string
           memo?: string | null
+          name?: string | null
           payout_1_1?: number | null
           payout_30_45?: number | null
           payout_7_1?: number | null
@@ -160,6 +240,7 @@ export type Database = {
           currency?: string | null
           id?: string
           memo?: string | null
+          name?: string | null
           payout_1_1?: number | null
           payout_30_45?: number | null
           payout_7_1?: number | null
