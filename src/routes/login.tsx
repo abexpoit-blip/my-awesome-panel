@@ -14,8 +14,12 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [securityAnswer, setSecurityAnswer] = useState("");
-  const [num1] = useState(Math.floor(Math.random() * 9) + 1);
-  const [num2] = useState(Math.floor(Math.random() * 9) + 1);
+  const [num1, setNum1] = useState(0);
+  const [num2, setNum2] = useState(0);
+  useEffect(() => {
+    setNum1(Math.floor(Math.random() * 9) + 1);
+    setNum2(Math.floor(Math.random() * 9) + 1);
+  }, []);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
