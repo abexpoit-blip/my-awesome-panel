@@ -92,7 +92,7 @@ function DashboardLayout() {
         isSidebarOpen ? "w-64" : "w-20"
       )}>
         <div className="p-4 flex items-center gap-2 border-b">
-          <span className="text-2xl font-bold italic text-blue-800">iMS</span>
+          <span className="text-3xl font-bold italic tracking-tighter text-[#2b3a4a] ml-4">iMS</span>
         </div>
         
         <nav className="flex-1 py-4 overflow-y-auto">
