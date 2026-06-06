@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getEffectiveUserId } from "@/lib/auth-helpers";
 import {
   Table,
   TableBody,
@@ -43,8 +44,8 @@ function DashboardPage() {
   const { data: statsData } = useQuery({
     queryKey: ['dashboard_stats'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      const userId = await getEffectiveUserId();
+      if (!userId) return null;
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -60,10 +61,10 @@ function DashboardPage() {
         { count: last7DaysCount },
         { data: monthData }
       ] = await Promise.all([
-        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', today.toISOString()),
-        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', yesterday.toISOString()).lt('created_at', today.toISOString()),
-        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', last7Days.toISOString()),
-        supabase.from('sms_logs').select('payout').eq('agent_id', user.id).gte('created_at', startOfMonth.toISOString())
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', userId).gte('created_at', today.toISOString()),
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', userId).gte('created_at', yesterday.toISOString()).lt('created_at', today.toISOString()),
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', userId).gte('created_at', last7Days.toISOString()),
+        supabase.from('sms_logs').select('payout').eq('agent_id', userId).gte('created_at', startOfMonth.toISOString())
       ]);
 
       const monthPayout = monthData?.reduce((acc: number, curr: any) => acc + (Number(curr.payout) || 0), 0) || 0;
@@ -80,13 +81,13 @@ function DashboardPage() {
   const { data: recentClients } = useQuery({
     queryKey: ['recent_clients'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      const userId = await getEffectiveUserId();
+      if (!userId) return [];
 
       const { data, error } = await supabase
         .from('clients')
         .select('*')
-        .eq('agent_id', user.id)
+        .eq('agent_id', userId)
         .order('created_at', { ascending: false })
         .limit(10);
       if (error) throw error;

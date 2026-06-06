@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getEffectiveUserId } from "@/lib/auth-helpers";
 import { useState } from "react";
 import {
   Table,
@@ -45,13 +46,13 @@ function ClientsPage() {
   const { data: clients, isLoading, refetch } = useQuery({
     queryKey: ['clients'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      const userId = await getEffectiveUserId();
+      if (!userId) return [];
 
       const { data, error } = await supabase
         .from('clients')
         .select('*')
-        .eq('agent_id', user.id)
+        .eq('agent_id', userId)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data;
@@ -61,14 +62,14 @@ function ClientsPage() {
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const userId = await getEffectiveUserId();
+      if (!userId) throw new Error("Not authenticated");
 
       const { data, error } = await supabase
         .from('clients')
         .insert([{
           ...newClient,
-          agent_id: user.id,
+          agent_id: userId,
           status: 'Active'
         }]);
 

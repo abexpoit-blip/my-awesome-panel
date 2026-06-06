@@ -16,7 +16,9 @@ import {
   Bell,
   Maximize,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  UserCheck,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 
 export const Route = createFileRoute("/_dashboard")({
@@ -39,36 +42,67 @@ function DashboardLayout() {
   const [isSmsModuleOpen, setIsSmsModuleOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [impersonatedAgent, setImpersonatedAgent] = useState<any>(null);
   const [activeRates, setActiveRates] = useState<any[]>([]);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate({ to: "/login" });
-        return;
-      }
-      
-      const { data: profile } = await supabase
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate({ to: "/login" });
+      return;
+    }
+    
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+    
+    setProfile(profile);
+
+    // Impersonation check
+    const impersonatedId = sessionStorage.getItem('impersonated_agent_id');
+    if (impersonatedId && profile?.is_admin) {
+      const { data: agent } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('id', impersonatedId)
         .single();
-      
-      setProfile(profile);
+      if (agent) {
+        setImpersonatedAgent(agent);
+      }
+    } else {
+      setImpersonatedAgent(null);
+    }
 
-      // Fetch active rates
-      const { data: rates } = await supabase
-        .from('active_rates')
-        .select('*')
-        .order('created_at', { ascending: true });
-      if (rates) setActiveRates(rates);
-    };
+    // Fetch active rates
+    const { data: rates } = await supabase
+      .from('active_rates')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (rates) setActiveRates(rates);
+  };
+
+  useEffect(() => {
     checkUser();
   }, [navigate]);
+
+  // Listen for storage changes (impersonation)
+  useEffect(() => {
+    const handleStorageChange = () => checkUser();
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const handleExitImpersonation = () => {
+    sessionStorage.removeItem('impersonated_agent_id');
+    setImpersonatedAgent(null);
+    toast.success("Returned to Admin Panel");
+    navigate({ to: "/admin" });
+  };
 
   const menuItems = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
@@ -102,7 +136,7 @@ function DashboardLayout() {
     { label: "Credit Notes", icon: FileText, href: "/credits" },
     { label: "News", icon: Newspaper, href: "/news" },
     { label: "SMS Test Panel", icon: Settings, href: "/test-panel" },
-    ...(profile?.is_admin ? [{ label: "Admin Panel", icon: ShieldCheck, href: "/admin" }] : []),
+    ...(profile?.is_admin && !impersonatedAgent ? [{ label: "Admin Panel", icon: ShieldCheck, href: "/admin" }] : []),
   ];
 
   return (
@@ -216,7 +250,26 @@ function DashboardLayout() {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen">
+      <div className="flex-1 flex flex-col min-w-0 h-screen relative">
+        {/* Impersonation Banner */}
+        {impersonatedAgent && (
+          <div className="bg-[#e81500] text-white px-6 py-2 flex items-center justify-between z-30 animate-pulse">
+            <div className="flex items-center gap-3">
+              <UserCheck size={18} />
+              <div className="text-[12px] font-black uppercase tracking-wider">
+                IMPERSONATING AGENT: <span className="underline underline-offset-4">{impersonatedAgent.username}</span>
+              </div>
+            </div>
+            <Button 
+              onClick={handleExitImpersonation}
+              variant="outline" 
+              className="h-7 px-4 bg-white/10 border-white/30 text-white hover:bg-white hover:text-[#e81500] text-[10px] font-black uppercase"
+            >
+              EXIT PANEL
+            </Button>
+          </div>
+        )}
+
         {/* Header */}
         <header className="h-16 bg-white border-b border-[#e3e6ec] flex items-center justify-between px-6 shrink-0 z-10">
           <div className="flex items-center gap-4">
