@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { 
   Users, 
   MessageSquare, 
   TrendingUp, 
   DollarSign 
 } from "lucide-react";
+
 import { 
   BarChart, 
   Bar, 
