@@ -88,7 +88,7 @@ function AdminDashboard() {
                       <TableHead className="px-6 py-5 text-[10px] font-black uppercase text-[#69707a] tracking-widest">Account Status</TableHead>
                       <TableHead className="px-6 py-5 text-[10px] font-black uppercase text-[#69707a] tracking-widest">Joined</TableHead>
                       <TableHead className="px-6 py-5 text-[10px] font-black uppercase text-[#69707a] tracking-widest text-center">Admin Actions</TableHead>
-                    </tr>
+                    </TableRow>
                   </TableHeader>
                   <TableBody>
                     {loading ? (
