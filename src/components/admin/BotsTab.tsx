@@ -4,11 +4,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Bot, Plus, Trash2, Settings, Terminal, RefreshCw, Activity, ShieldCheck, Layout } from "lucide-react";
+import { Bot, Plus, Trash2, Settings, Terminal, RefreshCw, Activity, ShieldCheck, Layout, CheckSquare, Square, MoreHorizontal, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export function BotsTab() {
   const [bots, setBots] = useState<any[]>([]);
@@ -17,6 +19,7 @@ export function BotsTab() {
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
+  const [selectedNumbers, setSelectedNumbers] = useState<string[]>([]);
   const [isAddBotOpen, setIsAddBotOpen] = useState(false);
   const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
   const [isAddNumberOpen, setIsAddNumberOpen] = useState(false);
@@ -32,7 +35,7 @@ export function BotsTab() {
     setLoading(true);
     const { data: botsData } = await supabase.from('bots').select('*');
     const { data: panelsData } = await supabase.from('number_panels').select('*');
-    const { data: numbersData } = await supabase.from('number_pool').select('*, bots(name), number_panels(name)');
+    const { data: numbersData } = await supabase.from('number_pool').select('*, bots(name), number_panels(name), profiles(username)');
     const { data: logsData } = await supabase.from('otp_audit_log').select('*').order('created_at', { ascending: false }).limit(20);
     
     setBots(botsData || []);
@@ -69,7 +72,7 @@ export function BotsTab() {
   const handleAddNumber = async () => {
     const { error } = await supabase.from('number_pool').insert([{
         ...newNumber,
-        status: 'active'
+        status: 'available'
     }]);
     if (error) toast.error("Failed to add number");
     else {
@@ -97,6 +100,44 @@ export function BotsTab() {
     else toast.success(`Setting ${key} updated`);
   };
 
+  const toggleAutomation = async (type: 'bot' | 'panel', id: string, field: string, value: boolean) => {
+    const table = type === 'bot' ? 'bots' : 'number_panels';
+    // Use type assertion to avoid strict literal index signature errors
+    const { error } = await supabase.from(table as any).update({ [field]: value } as any).eq('id', id);
+    if (error) toast.error("Failed to update automation");
+    else {
+      toast.success("Automation setting updated");
+      fetchData();
+    }
+  };
+
+  const handleBulkAction = async (action: string) => {
+    if (selectedNumbers.length === 0) return;
+    
+    let updateData = {};
+    if (action === 'delete') {
+      const { error } = await supabase.from('number_pool').delete().in('id', selectedNumbers);
+      if (error) toast.error("Bulk delete failed");
+      else toast.success(`Deleted ${selectedNumbers.length} numbers`);
+    } else {
+      if (action === 'release') updateData = { status: 'available', reserved_for: null, reserved_at: null };
+      else if (action === 'expire') updateData = { status: 'expired' };
+      
+      const { error } = await supabase.from('number_pool').update(updateData).in('id', selectedNumbers);
+      if (error) toast.error("Bulk update failed");
+      else toast.success(`Updated ${selectedNumbers.length} numbers`);
+    }
+    
+    setSelectedNumbers([]);
+    fetchData();
+  };
+
+  const toggleNumberSelection = (id: string) => {
+    setSelectedNumbers(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="status" className="w-full">
@@ -110,7 +151,7 @@ export function BotsTab() {
         <TabsContent value="status">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-black text-[#2b3a4a] uppercase text-xs tracking-widest flex items-center gap-2">
-              <Bot size={16} className="text-[#0061f2]" /> OTP Scraper Workers
+              <Bot size={16} className="text-[#0061f2]" /> Scraper Automations
             </h3>
             <Button onClick={() => setIsAddBotOpen(true)} size="sm" className="bg-[#0061f2] text-white font-bold text-[10px] uppercase h-8"><Plus size={14} className="mr-1" /> New Bot</Button>
           </div>
@@ -129,9 +170,19 @@ export function BotsTab() {
                   )}>{bot.status}</span>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase text-[#69707a]">
-                   <div className="bg-slate-50 p-2 rounded border border-slate-100">Last Seen: <span className="text-[#2b3a4a] block">{bot.last_seen ? new Date(bot.last_seen).toLocaleTimeString() : 'Never'}</span></div>
-                   <div className="bg-slate-50 p-2 rounded border border-slate-100">Status: <span className="text-[#2b3a4a] block">{bot.status}</span></div>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase text-[#69707a]">
+                    <div className="bg-slate-50 p-2 rounded border border-slate-100">Last Seen: <span className="text-[#2b3a4a] block">{bot.last_seen ? new Date(bot.last_seen).toLocaleTimeString() : 'Never'}</span></div>
+                    <div className="bg-slate-50 p-2 rounded border border-slate-100">Status: <span className="text-[#2b3a4a] block">{bot.status}</span></div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-100">
+                    <span className="text-[9px] font-black uppercase text-slate-500">Auto Re-login</span>
+                    <Checkbox 
+                      checked={bot.auto_relogin} 
+                      onCheckedChange={(checked) => toggleAutomation('bot', bot.id, 'auto_relogin', !!checked)}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex gap-2 pt-2 border-t border-slate-100">
@@ -139,10 +190,7 @@ export function BotsTab() {
                     <Settings size={14} className="mr-1" /> Config
                   </Button>
                   <Button variant="outline" size="sm" className="h-8 text-[10px] font-black uppercase border-slate-200 text-blue-600 hover:bg-blue-50">
-                    <RefreshCw size={14} className="mr-1" /> Re-Login
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-slate-200 text-red-500 hover:bg-red-50">
-                    <Trash2 size={14} />
+                    <RefreshCw size={14} className="mr-1" /> Force Login
                   </Button>
                 </div>
               </div>
@@ -153,7 +201,7 @@ export function BotsTab() {
         <TabsContent value="panels">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-black text-[#2b3a4a] uppercase text-xs tracking-widest flex items-center gap-2">
-              <Layout size={16} className="text-[#0061f2]" /> Number Panel Logins
+              <Layout size={16} className="text-[#0061f2]" /> Number Panel Automation
             </h3>
             <Button onClick={() => setIsAddPanelOpen(true)} size="sm" className="bg-[#0061f2] text-white font-bold text-[10px] uppercase h-8"><Plus size={14} className="mr-1" /> New Panel</Button>
           </div>
@@ -172,17 +220,22 @@ export function BotsTab() {
                   )}>{panel.status}</span>
                 </div>
                 
-                <div className="space-y-2 text-[10px] font-bold uppercase text-[#69707a]">
-                   <div className="bg-slate-50 p-2 rounded border border-slate-100">User: <span className="text-[#2b3a4a] ml-1">{panel.username}</span></div>
-                   <div className="bg-slate-50 p-2 rounded border border-slate-100">Last Login: <span className="text-[#2b3a4a] ml-1">{panel.last_login ? new Date(panel.last_login).toLocaleString() : 'Never'}</span></div>
+                <div className="space-y-3">
+                   <div className="bg-slate-50 p-2 rounded border border-slate-100 text-[10px] font-bold uppercase text-[#69707a]">
+                      User: <span className="text-[#2b3a4a] ml-1">{panel.username}</span>
+                   </div>
+                   <div className="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-100">
+                    <span className="text-[9px] font-black uppercase text-slate-500">Keep Alive</span>
+                    <Checkbox 
+                      checked={panel.session_keep_alive} 
+                      onCheckedChange={(checked) => toggleAutomation('panel', panel.id, 'session_keep_alive', !!checked)}
+                    />
+                  </div>
                 </div>
 
                 <div className="flex gap-2 pt-2 border-t border-slate-100">
                   <Button variant="outline" size="sm" className="flex-1 h-8 text-[10px] font-black uppercase border-slate-200 text-blue-600 hover:bg-blue-50">
-                    <RefreshCw size={14} className="mr-1" /> Check Session
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-slate-200 text-red-500 hover:bg-red-50">
-                    <Trash2 size={14} />
+                    <RefreshCw size={14} className="mr-1" /> Test Login
                   </Button>
                 </div>
               </div>
@@ -192,32 +245,65 @@ export function BotsTab() {
 
         <TabsContent value="pool">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-black text-[#2b3a4a] uppercase text-xs tracking-widest flex items-center gap-2">
-              <Terminal size={16} className="text-[#0061f2]" /> Active Number Pool
-            </h3>
-            <Button onClick={() => setIsAddNumberOpen(true)} size="sm" className="bg-[#0061f2] text-white font-bold text-[10px] uppercase h-8"><Plus size={14} className="mr-1" /> Add Number</Button>
+            <div>
+              <h3 className="font-black text-[#2b3a4a] uppercase text-xs tracking-widest flex items-center gap-2">
+                <Terminal size={16} className="text-[#0061f2]" /> Number Inventory
+              </h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Available: {numbers.filter(n => n.status === 'available').length} | Reserved: {numbers.filter(n => n.status === 'reserved').length}</p>
+            </div>
+            <div className="flex gap-2">
+              {selectedNumbers.length > 0 && (
+                <div className="flex items-center gap-2 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200 mr-2">
+                   <span className="text-[10px] font-black uppercase text-slate-600">{selectedNumbers.length} Selected</span>
+                   <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                         <Button size="sm" variant="ghost" className="h-6 w-6 p-0"><MoreHorizontal size={14} /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="rounded-xl">
+                         <DropdownMenuItem onClick={() => handleBulkAction('release')} className="text-xs font-bold uppercase">Release to Pool</DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => handleBulkAction('expire')} className="text-xs font-bold uppercase">Mark Expired</DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => handleBulkAction('delete')} className="text-xs font-bold uppercase text-red-600">Bulk Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                   </DropdownMenu>
+                </div>
+              )}
+              <Button onClick={() => setIsAddNumberOpen(true)} size="sm" className="bg-[#0061f2] text-white font-bold text-[10px] uppercase h-8"><Plus size={14} className="mr-1" /> New Number</Button>
+            </div>
           </div>
           
           <div className="bg-white rounded-xl shadow-lg border border-[#e3e6ec] overflow-hidden">
             <Table>
-              <TableHeader><TableRow className="bg-[#f8f9fc]"><TableHead className="text-[10px] font-black uppercase px-6">Number</TableHead><TableHead className="text-[10px] font-black uppercase px-6">Service</TableHead><TableHead className="text-[10px] font-black uppercase px-6">Panel/Bot</TableHead><TableHead className="text-[10px] font-black uppercase px-6">Status</TableHead><TableHead className="text-[10px] font-black uppercase px-6 text-center">Action</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow className="bg-[#f8f9fc]">
+                <TableHead className="w-12 px-6"><Checkbox checked={selectedNumbers.length === numbers.length && numbers.length > 0} onCheckedChange={(checked) => setSelectedNumbers(checked ? numbers.map(n => n.id) : [])} /></TableHead>
+                <TableHead className="text-[10px] font-black uppercase px-6">Number</TableHead>
+                <TableHead className="text-[10px] font-black uppercase px-6">Service</TableHead>
+                <TableHead className="text-[10px] font-black uppercase px-6">Assignment</TableHead>
+                <TableHead className="text-[10px] font-black uppercase px-6">Status</TableHead>
+                <TableHead className="text-[10px] font-black uppercase px-6 text-center">Action</TableHead>
+              </TableRow></TableHeader>
               <TableBody>
                 {numbers.map(n => (
-                  <TableRow key={n.id} className="border-b border-[#f2f4f8]">
+                  <TableRow key={n.id} className={cn("border-b border-[#f2f4f8]", selectedNumbers.includes(n.id) && "bg-blue-50/50")}>
+                    <td className="px-6 py-3"><Checkbox checked={selectedNumbers.includes(n.id)} onCheckedChange={() => toggleNumberSelection(n.id)} /></td>
                     <td className="px-6 py-3 font-black text-[#2b3a4a] text-[13px]">{n.number}</td>
-                    <td className="px-6 py-3 text-[11px] font-bold text-[#69707a] uppercase">{n.service_tag || 'Any'}</td>
+                    <td className="px-6 py-3 text-[11px] font-bold text-[#69707a] uppercase">{n.service_tag || 'Global'}</td>
                     <td className="px-6 py-3 text-[11px] font-medium text-[#69707a]">
-                       {n.number_panels?.name ? (
-                         <div className="flex flex-col">
-                            <span className="text-[9px] font-black text-[#0061f2] uppercase">Panel: {n.number_panels.name}</span>
-                            <span className="opacity-50 text-[9px]">Bot: {n.bots?.name || 'None'}</span>
-                         </div>
+                       {n.status === 'reserved' ? (
+                          <div className="flex flex-col">
+                             <span className="text-[9px] font-black text-[#0061f2] uppercase">Reserved for: {n.profiles?.username}</span>
+                             <span className="opacity-50 text-[9px]">Since: {new Date(n.reserved_at).toLocaleTimeString()}</span>
+                          </div>
                        ) : (
-                         n.bots?.name || 'Unassigned'
+                          n.number_panels?.name || n.bots?.name || 'Unassigned'
                        )}
                     </td>
                     <td className="px-6 py-3">
-                       <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[9px] font-black uppercase border border-blue-100">{n.status}</span>
+                       <span className={cn(
+                          "px-2 py-0.5 rounded text-[9px] font-black uppercase border shadow-sm",
+                          n.status === 'available' ? "bg-green-50 text-green-600 border-green-200" :
+                          n.status === 'reserved' ? "bg-amber-50 text-amber-600 border-amber-200" :
+                          "bg-slate-50 text-slate-600 border-slate-200"
+                       )}>{n.status}</span>
                     </td>
                     <td className="px-6 py-3 text-center">
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-500 hover:bg-red-50">
@@ -427,5 +513,6 @@ export function BotsTab() {
     </div>
   );
 }
+
 
 
