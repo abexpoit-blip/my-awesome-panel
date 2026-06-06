@@ -38,14 +38,14 @@ function CreditsPage() {
     const userId = await getEffectiveUserId();
     if (!userId || !profile) return;
 
-    if (Number(profile.balance) < 100) {
+    if (Number(profile.balance || 0) < 100) {
       toast.error("Minimum payout is $100.00");
       return;
     }
 
     const { error } = await supabase.from('payouts').insert([{
       agent_id: userId,
-      amount: profile.balance,
+      amount: Number(profile.balance || 0),
       status: 'pending'
     }]);
 
