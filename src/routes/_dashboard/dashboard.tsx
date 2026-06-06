@@ -31,48 +31,49 @@ export const Route = createFileRoute("/_dashboard/dashboard")({
   component: DashboardPage,
 });
 
-const chartData = [
-  { name: '2026-05-31', sms: 400, payout: 15 },
-  { name: '2026-06-01', sms: 300, payout: 12 },
-  { name: '2026-06-02', sms: 200, payout: 8 },
-  { name: '2026-06-03', sms: 100, payout: 5 },
-  { name: '2026-06-04', sms: 500, payout: 22 },
-  { name: '2026-06-05', sms: 450, payout: 19 },
-  { name: '2026-06-06', sms: 431, payout: 18 },
-];
-
 function DashboardPage() {
-  const { data: recentClients } = useQuery({
-    queryKey: ['recent_clients'],
+  const { data: statsData } = useQuery({
+    queryKey: ['dashboard_stats'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('clients')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
-      if (error) throw error;
-      return data;
-    }
-  });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
 
-  const { data: recentRanges } = useQuery({
-    queryKey: ['recent_ranges'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('sms_ranges')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
-      if (error) return [];
-      return data;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const last7Days = new Date(today);
+      last7Days.setDate(last7Days.getDate() - 7);
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      const [
+        { count: todayCount },
+        { count: yesterdayCount },
+        { count: last7DaysCount },
+        { data: monthData }
+      ] = await Promise.all([
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', today.toISOString()),
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', yesterday.toISOString()).lt('created_at', today.toISOString()),
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', last7Days.toISOString()),
+        supabase.from('sms_logs').select('payout').eq('agent_id', user.id).gte('created_at', startOfMonth.toISOString())
+      ]);
+
+      const monthPayout = monthData?.reduce((acc, curr) => acc + (Number(curr.payout) || 0), 0) || 0;
+
+      return {
+        today: todayCount || 0,
+        yesterday: yesterdayCount || 0,
+        last7Days: last7DaysCount || 0,
+        monthPayout: monthPayout.toFixed(2)
+      };
     }
   });
 
   const stats = [
-    { label: "TODAY SMS", value: "434", color: "bg-[#0061f2]", footer: "SMS Received Today" },
-    { label: "YESTERDAY SMS", value: "402", color: "bg-[#e81500]", footer: "These received yesterday" },
-    { label: "Last 7 Days", value: "3091", color: "bg-[#00ac69]", footer: "Received in last 7 days" },
-    { label: "Money This Month", value: "54.5", color: "bg-[#f4a100]", footer: "Payout in this month", prefix: "" },
+    { label: "TODAY SMS", value: statsData?.today?.toString() || "0", color: "bg-[#0061f2]", footer: "SMS Received Today" },
+    { label: "YESTERDAY SMS", value: statsData?.yesterday?.toString() || "0", color: "bg-[#e81500]", footer: "These received yesterday" },
+    { label: "Last 7 Days", value: statsData?.last7Days?.toString() || "0", color: "bg-[#00ac69]", footer: "Received in last 7 days" },
+    { label: "Money This Month", value: statsData?.monthPayout || "0.00", color: "bg-[#f4a100]", footer: "Payout in this month", prefix: "$" },
   ];
 
   return (
