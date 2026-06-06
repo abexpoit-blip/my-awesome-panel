@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Bot, Plus, Trash2, Settings, Terminal, RefreshCw, Save, ShieldCheck } from "lucide-react";
+import { Bot, Plus, Trash2, Settings, Terminal, RefreshCw, Activity, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
