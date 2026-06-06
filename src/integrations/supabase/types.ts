@@ -41,6 +41,54 @@ export type Database = {
         }
         Relationships: []
       }
+      banned_keywords: {
+        Row: {
+          created_at: string | null
+          id: string
+          keyword: string
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          keyword: string
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          keyword?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
+      bots: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          id: string
+          last_seen: string | null
+          name: string
+          status: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          last_seen?: string | null
+          name: string
+          status?: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          last_seen?: string | null
+          name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           agent_id: string | null
@@ -79,12 +127,93 @@ export type Database = {
           },
         ]
       }
+      number_pool: {
+        Row: {
+          bot_id: string | null
+          created_at: string | null
+          id: string
+          number: string
+          payout_rate: number | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          bot_id?: string | null
+          created_at?: string | null
+          id?: string
+          number: string
+          payout_rate?: number | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          bot_id?: string | null
+          created_at?: string | null
+          id?: string
+          number?: string
+          payout_rate?: number | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "number_pool_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: false
+            referencedRelation: "bots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payouts: {
+        Row: {
+          agent_id: string
+          amount: number
+          created_at: string | null
+          id: string
+          payment_method: string | null
+          status: string
+          transaction_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          amount: number
+          created_at?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          created_at?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payouts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          balance: number | null
           created_at: string | null
           full_name: string | null
           id: string
           is_admin: boolean | null
+          last_payout_at: string | null
           role: string | null
           skype_id: string | null
           status: string | null
@@ -92,10 +221,12 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          balance?: number | null
           created_at?: string | null
           full_name?: string | null
           id: string
           is_admin?: boolean | null
+          last_payout_at?: string | null
           role?: string | null
           skype_id?: string | null
           status?: string | null
@@ -103,10 +234,12 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          balance?: number | null
           created_at?: string | null
           full_name?: string | null
           id?: string
           is_admin?: boolean | null
+          last_payout_at?: string | null
           role?: string | null
           skype_id?: string | null
           status?: string | null
