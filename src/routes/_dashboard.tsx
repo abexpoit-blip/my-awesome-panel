@@ -110,11 +110,18 @@ function DashboardLayout() {
         "bg-white border-r border-[#e3e6ec] transition-all duration-300 flex flex-col z-20 sticky top-0 h-screen shadow-sm",
         isSidebarOpen ? "w-[240px]" : "w-[70px]"
       )}>
-        <div className="h-16 flex items-center justify-center border-b border-[#e3e6ec]">
-          <span className={cn(
-            "font-black italic tracking-tighter text-[#2b3a4a] transition-all duration-300",
-            isSidebarOpen ? "text-3xl" : "text-xl"
-          )}>iMS</span>
+        <div className="h-16 flex items-center justify-center border-b border-[#e3e6ec] px-4">
+          <Link to="/dashboard" className="flex items-center justify-center">
+            {isSidebarOpen ? (
+              <img 
+                src="https://www.imssms.org/assets/images/logo.png" 
+                alt="IMS logo" 
+                className="h-10 object-contain"
+              />
+            ) : (
+              <span className="font-black italic tracking-tighter text-[#2b3a4a] text-xl">iMS</span>
+            )}
+          </Link>
         </div>
         
         <nav className="flex-1 py-4 overflow-y-auto custom-scrollbar overflow-x-hidden">

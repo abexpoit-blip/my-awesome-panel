@@ -3,9 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { 
   Users, 
-  MessageSquare, 
   TrendingUp, 
-  DollarSign 
 } from "lucide-react";
 import { 
   BarChart, 
@@ -42,6 +40,43 @@ const chartData = [
 ];
 
 function DashboardPage() {
+  const { data: statsData } = useQuery({
+    queryKey: ['dashboard_stats'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const last7Days = new Date(today);
+      last7Days.setDate(last7Days.getDate() - 7);
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      const [
+        { count: todayCount },
+        { count: yesterdayCount },
+        { count: last7DaysCount },
+        { data: monthData }
+      ] = await Promise.all([
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', today.toISOString()),
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', yesterday.toISOString()).lt('created_at', today.toISOString()),
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', last7Days.toISOString()),
+        supabase.from('sms_logs').select('payout').eq('agent_id', user.id).gte('created_at', startOfMonth.toISOString())
+      ]);
+
+      const monthPayout = monthData?.reduce((acc: number, curr: any) => acc + (Number(curr.payout) || 0), 0) || 0;
+
+      return {
+        today: todayCount || 0,
+        yesterday: yesterdayCount || 0,
+        last7Days: last7DaysCount || 0,
+        monthPayout: monthPayout.toFixed(2)
+      };
+    }
+  });
+
   const { data: recentClients } = useQuery({
     queryKey: ['recent_clients'],
     queryFn: async () => {
@@ -69,10 +104,10 @@ function DashboardPage() {
   });
 
   const stats = [
-    { label: "TODAY SMS", value: "434", color: "bg-[#0061f2]", footer: "SMS Received Today" },
-    { label: "YESTERDAY SMS", value: "402", color: "bg-[#e81500]", footer: "These received yesterday" },
-    { label: "Last 7 Days", value: "3091", color: "bg-[#00ac69]", footer: "Received in last 7 days" },
-    { label: "Money This Month", value: "54.5", color: "bg-[#f4a100]", footer: "Payout in this month", prefix: "" },
+    { label: "TODAY SMS", value: statsData?.today?.toString() || "0", color: "bg-[#0061f2]", footer: "SMS Received Today" },
+    { label: "YESTERDAY SMS", value: statsData?.yesterday?.toString() || "0", color: "bg-[#e81500]", footer: "These received yesterday" },
+    { label: "Last 7 Days", value: statsData?.last7Days?.toString() || "0", color: "bg-[#00ac69]", footer: "Received in last 7 days" },
+    { label: "Money This Month", value: statsData?.monthPayout || "0.00", color: "bg-[#f4a100]", footer: "Payout in this month", prefix: "$" },
   ];
 
   return (
@@ -97,7 +132,6 @@ function DashboardPage() {
               </div>
               <p className="text-[11px] mt-4 opacity-80 font-medium">{stat.footer}</p>
             </div>
-            {/* Decoration icons match IMS dashboard better */}
             <div className="absolute right-2 top-4 opacity-20 group-hover:scale-110 transition-transform duration-500">
                <TrendingUp size={24} />
             </div>
@@ -171,9 +205,9 @@ function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentRanges?.map((range, idx) => (
+                  {recentRanges?.map((range: any, idx: number) => (
                     <TableRow key={range.id} className={cn("border-b border-[#f2f4f8] hover:bg-gray-50/50 transition-colors", idx % 2 === 0 ? "bg-white" : "bg-[#fcfcfd]")}>
-                      <TableCell className="text-[13px] font-bold text-[#2b3a4a] px-6 py-4">{(range as any).name || range.memo || range.prefix}</TableCell>
+                      <TableCell className="text-[13px] font-bold text-[#2b3a4a] px-6 py-4">{range.name || range.memo || range.prefix}</TableCell>
                       <TableCell className="text-[13px] font-medium text-[#69707a] px-6 py-4">{range.prefix || '-'}</TableCell>
                     </TableRow>
                   ))}
@@ -206,7 +240,7 @@ function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentClients?.map((client, idx) => (
+                  {recentClients?.map((client: any, idx: number) => (
                     <TableRow key={client.id} className={cn("border-b border-[#f2f4f8] hover:bg-gray-50/50 transition-colors", idx % 2 === 0 ? "bg-white" : "bg-[#fcfcfd]")}>
                       <TableCell className="text-[13px] font-bold text-[#2b3a4a] px-6 py-4">{client.username}</TableCell>
                       <TableCell className="text-[13px] font-medium text-[#69707a] px-6 py-4">{client.email || '-'}</TableCell>
@@ -237,4 +271,4 @@ function DashboardPage() {
   );
 }
 
-
+export default DashboardPage;
