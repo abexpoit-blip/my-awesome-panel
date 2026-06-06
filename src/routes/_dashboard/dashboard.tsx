@@ -61,10 +61,10 @@ function DashboardPage() {
         { count: last7DaysCount },
         { data: monthData }
       ] = await Promise.all([
-        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', today.toISOString()),
-        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', yesterday.toISOString()).lt('created_at', today.toISOString()),
-        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', user.id).gte('created_at', last7Days.toISOString()),
-        supabase.from('sms_logs').select('payout').eq('agent_id', user.id).gte('created_at', startOfMonth.toISOString())
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', userId).gte('created_at', today.toISOString()),
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', userId).gte('created_at', yesterday.toISOString()).lt('created_at', today.toISOString()),
+        supabase.from('sms_logs').select('*', { count: 'exact', head: true }).eq('agent_id', userId).gte('created_at', last7Days.toISOString()),
+        supabase.from('sms_logs').select('payout').eq('agent_id', userId).gte('created_at', startOfMonth.toISOString())
       ]);
 
       const monthPayout = monthData?.reduce((acc: number, curr: any) => acc + (Number(curr.payout) || 0), 0) || 0;
