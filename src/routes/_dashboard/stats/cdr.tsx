@@ -80,7 +80,7 @@ function StatsCDRPage() {
                         </span>
                       </TableCell>
                       <TableCell className="text-[11px] font-medium text-[#69707a] px-6 py-4">
-                        {new Date(log.received_at).toLocaleString()}
+                        {log.received_at ? new Date(log.received_at).toLocaleString() : '-'}
                       </TableCell>
                     </TableRow>
                   ))
