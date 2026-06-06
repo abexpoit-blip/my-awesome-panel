@@ -19,7 +19,7 @@ services:
     environment:
       DATABASE_URL: postgres://${DB_USER:-nexus}:${DB_PASSWORD:-nexus123}@db:5432/${DB_NAME:-nexus_panel}
       JWT_SECRET: ${JWT_SECRET:-super-secret-key}
-      PORT: 3000
+      PORT: 3005
     networks:
       - nexus_network
 
@@ -40,7 +40,7 @@ services:
       dockerfile: ./deployment/frontend.Dockerfile
     container_name: nexus_nginx
     ports:
-      - "3001:80"
+      - "3000:80"
     environment:
       - VITE_SELF_HOSTED=true
       - VITE_API_URL=https://panel.nexus-x.site/api
