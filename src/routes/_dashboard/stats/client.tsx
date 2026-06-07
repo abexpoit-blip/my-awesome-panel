@@ -26,7 +26,7 @@ function StatsClientPage() {
       if (!clients) return [];
 
       // For each client, calculate stats
-      const stats = await Promise.all(clients.map(async (client) => {
+      const stats = await Promise.all(clients.map(async (client: any) => {
         const { count } = await supabase
           .from('sms_logs')
           .select('*', { count: 'exact', head: true })
