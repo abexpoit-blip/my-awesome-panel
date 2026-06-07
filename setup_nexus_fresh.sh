@@ -57,7 +57,7 @@ echo "--- 5. Setting Up Final Nginx Config ---"
 cat << 'NGINX_EOF' > $PROJECT_DIR/deployment/nginx/conf.d/default.conf
 server {
     listen 80;
-    server_name X.nexus-x.site;
+    server_name x.nexus-x.site;
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
@@ -70,10 +70,10 @@ server {
 
 server {
     listen 443 ssl;
-    server_name X.nexus-x.site;
+    server_name x.nexus-x.site;
 
-    ssl_certificate /etc/letsencrypt/live/X.nexus-x.site/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/X.nexus-x.site/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/x.nexus-x.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/x.nexus-x.site/privkey.pem;
 
     client_max_body_size 20M;
 
