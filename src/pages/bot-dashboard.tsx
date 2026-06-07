@@ -35,7 +35,7 @@ export default function BotDashboard() {
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-black text-[#2b3a4a] uppercase tracking-tighter">Bot Dashboard</h1>
-        <Button onClick={fetchBots} variant="outline" className="h-10 text-[11px] font-black uppercase"><RefreshCw size={14} className="mr-2" /> Refresh</Button>
+        <Button onClick={() => fetchBots()} variant="outline" className="h-10 text-[11px] font-black uppercase"><RefreshCw size={14} className="mr-2" /> Refresh</Button>
       </div>
 
       {loading ? (
