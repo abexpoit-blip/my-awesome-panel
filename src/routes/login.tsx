@@ -91,30 +91,6 @@ function LoginPage() {
     }
   };
 
-    if (profile.role === "client") {
-      navigate({ to: "/client/dashboard" });
-      setLoading(false);
-      return;
-    }
-
-    // Agent / admin require approved status
-    // Agent / admin require approved status
-    if (profile.status !== "approved") {
-      await supabase.auth.signOut();
-      toast.error("Account Pending Approval", {
-        description: "Your account is currently under review. Please contact support.",
-      });
-      setLoading(false);
-      return;
-    }
-
-    if (profile.is_admin) {
-      toast.info("Admin detected. Please use the secure admin login panel for full access.");
-    }
-
-    navigate({ to: "/dashboard" });
-    setLoading(false);
-  };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-white font-sans">
