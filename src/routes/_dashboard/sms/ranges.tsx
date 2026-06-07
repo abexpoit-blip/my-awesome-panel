@@ -112,25 +112,25 @@ function SmsRangesPage() {
                   <TableRow>
                     <TableCell colSpan={9} className="text-center py-10 text-gray-500 text-sm italic">Loading ranges...</TableCell>
                   </TableRow>
-                ) : ranges?.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={9} className="text-center py-10 text-gray-500 text-sm italic">No ranges found</TableCell>
-                  </TableRow>
-                ) : (
-                  ranges?.map((range: any) => (
-                    <TableRow key={range.id} className="border-b border-[#f2f4f8] hover:bg-gray-50 transition-colors">
-                      <TableCell className="text-xs font-bold text-[#2b3a4a] py-3 border-r border-[#e3e6ec]">{range.prefix}</TableCell>
-                      <TableCell className="text-xs text-[#2b3a4a] py-3 border-r border-[#e3e6ec]">{range.test_number}</TableCell>
-                      <TableCell className="text-xs text-[#2b3a4a] py-3 border-r border-[#e3e6ec]">{range.currency}</TableCell>
-                      <TableCell className="text-center text-xs font-bold text-[#e81500] py-3 border-r border-[#e3e6ec]">{range.payout_1_1 || 'NA'}</TableCell>
-                      <TableCell className="text-center text-xs font-bold text-[#0061f2] py-3 border-r border-[#e3e6ec]">${range.payout_7_1}</TableCell>
-                      <TableCell className="text-center text-xs font-bold text-[#e81500] py-3 border-r border-[#e3e6ec]">{range.payout_7_7 || 'NA'}</TableCell>
-                      <TableCell className="text-center text-xs font-bold text-[#0061f2] py-3 border-r border-[#e3e6ec]">${range.payout_30_45}</TableCell>
-                      <TableCell className="text-xs text-[#69707a] py-3 border-r border-[#e3e6ec]">{range.memo || '-'}</TableCell>
-                      <TableCell className="py-3"></TableCell>
-                    </TableRow>
-                  ))
-                )}
+        ) : filteredRanges?.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={9} className="text-center py-10 text-gray-500 text-sm italic">No ranges found</TableCell>
+          </TableRow>
+        ) : (
+          filteredRanges?.map((range: any) => (
+            <TableRow key={range.id} className="border-b border-[#f2f4f8] hover:bg-gray-50 transition-colors">
+              <TableCell className="text-xs font-bold text-[#2b3a4a] py-3 border-r border-[#e3e6ec]">{range.prefix}</TableCell>
+              <TableCell className="text-xs text-[#2b3a4a] py-3 border-r border-[#e3e6ec]">{range.test_number}</TableCell>
+              <TableCell className="text-xs text-[#2b3a4a] py-3 border-r border-[#e3e6ec]">{range.currency}</TableCell>
+              <TableCell className="text-center text-xs font-bold text-[#e81500] py-3 border-r border-[#e3e6ec]">{range.payout_1_1 || 'NA'}</TableCell>
+              <TableCell className="text-center text-xs font-bold text-[#0061f2] py-3 border-r border-[#e3e6ec]">${range.payout_7_1}</TableCell>
+              <TableCell className="text-center text-xs font-bold text-[#e81500] py-3 border-r border-[#e3e6ec]">{range.payout_7_7 || 'NA'}</TableCell>
+              <TableCell className="text-center text-xs font-bold text-[#0061f2] py-3 border-r border-[#e3e6ec]">${range.payout_30_45}</TableCell>
+              <TableCell className="text-xs text-[#69707a] py-3 border-r border-[#e3e6ec]">{range.memo || '-'}</TableCell>
+              <TableCell className="py-3"></TableCell>
+            </TableRow>
+          ))
+        )}
               </TableBody>
             </Table>
           </div>
