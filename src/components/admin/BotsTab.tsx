@@ -348,15 +348,15 @@ export function BotsTab() {
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label className="text-[10px] font-bold uppercase">Username</Label>
-                          <Input className="h-10 rounded-lg" onChange={(e) => updateBotSetting('hadi_username', e.target.value)} />
+                          <Input className="h-10 rounded-lg" onChange={(e) => updateBotSetting('hadi_username', e.target.value, bots.find(b => b.bot_type === 'smshadi')?.id)} />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-bold uppercase">Password</Label>
-                          <Input type="password" placeholder="Hadi Password..." className="h-10 rounded-lg" onChange={(e) => updateBotSetting('hadi_password', e.target.value)} />
+                          <Input type="password" placeholder="Hadi Password..." className="h-10 rounded-lg" onChange={(e) => updateBotSetting('hadi_password', e.target.value, bots.find(b => b.bot_type === 'smshadi')?.id)} />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-bold uppercase">Cookies</Label>
-                          <Input placeholder="Enter login cookies..." className="h-10 rounded-lg" onChange={(e) => updateBotSetting('hadi_cookies', e.target.value)} />
+                          <Input placeholder="Enter login cookies..." className="h-10 rounded-lg" onChange={(e) => updateBotSetting('hadi_cookies', e.target.value, bots.find(b => b.bot_type === 'smshadi')?.id)} />
                         </div>
                       </div>
                     </div>
