@@ -21,6 +21,9 @@ export const Route = createFileRoute("/_dashboard/sms/numbers")({
 });
 
 function SmsNumbersPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterRange, setFilterRange] = useState("All Ranges");
+
   const { data: numbers, isLoading } = useQuery({
     queryKey: ['number_pool_view'],
     queryFn: async () => {
@@ -32,6 +35,28 @@ function SmsNumbersPage() {
       return data;
     }
   });
+
+  const filteredNumbers = numbers?.filter((num: any) => 
+    (filterRange === "All Ranges" || num.service_tag === filterRange) &&
+    (num.number?.includes(searchTerm) || num.service_tag?.toLowerCase().includes(searchTerm.toLowerCase()))
+  ) || [];
+
+  const handleExport = () => {
+    const headers = ["Number", "Service", "Status", "Last Update"];
+    const csvData = filteredNumbers.map((num: any) => [
+      num.number,
+      num.service_tag || 'Global',
+      num.status,
+      new Date(num.updated_at || num.created_at).toLocaleString()
+    ]);
+    const csvContent = [headers, ...csvData].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Numbers_Report_${new Date().toISOString()}.csv`;
+    link.click();
+    toast.success("Export started");
+  };
 
   return (
     <div className="space-y-6">
