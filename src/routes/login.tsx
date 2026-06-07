@@ -35,85 +35,62 @@ function LoginPage() {
     setLoading(true);
     const raw = username.trim();
 
-    // Standardize candidates to avoid redundant lookups
-    const candidates = raw.includes("@")
-      ? [raw]
-      : [
-          `${raw.toLowerCase()}@nexus.site`,
-          `${raw.toLowerCase()}@imssms.org`,
-          `${raw.toLowerCase()}@client.imssms.org`,
-          `${raw.toLowerCase()}@admin.com`,
-          raw
-        ];
-
-    let signedInUserId: string | null = null;
-    let lastError: string | null = null;
-
-    // Fast-path for common usernames to reduce auth latency
-    const prioritizedEmail = raw.includes("@") ? raw : `${raw.toLowerCase()}@nexus.site`;
-    const firstAttempt = await supabase.auth.signInWithPassword({ email: prioritizedEmail, password });
-
-    if (!firstAttempt.error && firstAttempt.data.user) {
-      signedInUserId = firstAttempt.data.user.id;
-    } else {
-      // If primary fails, check others in parallel
-      const otherCandidates = candidates.filter(c => c !== prioritizedEmail);
-      const results = await Promise.all(
-        otherCandidates.map(email => supabase.auth.signInWithPassword({ email, password }))
-      );
-      
-      const success = results.find(r => !r.error && r.data.user);
-      if (success) {
-        signedInUserId = success.data.user.id;
-      } else {
-        lastError = firstAttempt.error?.message || results[0]?.error?.message || "Invalid credentials.";
-      }
-    }
-
-    if (!signedInUserId) {
-      toast.error("Login failed", { description: lastError || "Invalid credentials." });
-      setLoading(false);
-      return;
-    }
-
-    // Read profile to determine role / approval
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("status, role, is_admin")
-      .eq("id", signedInUserId)
-      .single();
-
-    if (profileError || !profile) {
-      await supabase.auth.signOut();
-      toast.error("Account not found", { description: "Profile missing. Contact support." });
-      setLoading(false);
-      return;
-    }
-
-    if (profile.role === "client") {
-      navigate({ to: "/client/dashboard" });
-      setLoading(false);
-      return;
-    }
-
-    // Agent / admin require approved status
-    // Agent / admin require approved status
-    if (profile.status !== "approved") {
-      await supabase.auth.signOut();
-      toast.error("Account Pending Approval", {
-        description: "Your account is currently under review. Please contact support.",
+    try {
+      const result = await supabase.auth.signInWithPassword({ 
+        email: raw, 
+        password 
       });
+
+      if (result.error) {
+        toast.error("Login failed", { description: result.error.message || "Invalid credentials." });
+        setLoading(false);
+        return;
+      }
+
+      const signedInUserId = result.data.user.id;
+      
+      // Read profile to determine role / approval
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("status, role, is_admin")
+        .eq("id", signedInUserId)
+        .single();
+
+      if (profileError || !profile) {
+        await supabase.auth.signOut();
+        toast.error("Account error", { description: "Profile not found. Contact support." });
+        setLoading(false);
+        return;
+      }
+
+      if (profile.role === "client") {
+        navigate({ to: "/client/dashboard" });
+        setLoading(false);
+        return;
+      }
+
+      // Agent / admin require approved status
+      if (profile.status !== "approved") {
+        await supabase.auth.signOut();
+        toast.error("Account Pending Approval", {
+          description: "Your account is currently under review or suspended.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (profile.is_admin) {
+        toast.info("Admin detected. Proceeding to dashboard.");
+      }
+
+      navigate({ to: "/dashboard" });
+    } catch (err: any) {
+      toast.error("Error", { description: err.message || "Something went wrong." });
+    } finally {
       setLoading(false);
-      return;
     }
-
-    if (profile.is_admin) {
-      toast.info("Admin detected. Please use the secure admin login panel for full access.");
-    }
-
-    navigate({ to: "/dashboard" });
-    setLoading(false);
   };
+
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-white font-sans">

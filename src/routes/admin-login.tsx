@@ -27,7 +27,7 @@ function AdminLogin() {
       // Admin login usually uses email in Supabase, but we can treat username as email if needed
       // or just assume they enter their email. The user said "agent and cleint login panel same but admin login panel separate"
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: username.includes('@') ? username : `${username}@admin.com`, // Defaulting to email format if needed
+        email: username,
         password,
       });
 
