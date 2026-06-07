@@ -26,7 +26,8 @@ function AdminDashboard() {
   const [syncResults, setSyncResults] = useState<any>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const navigate = useNavigate();
-  const { tab } = Route.useSearch<{ tab?: string }>();
+  const search = Route.useSearch() as { tab?: string };
+  const tab = search.tab;
 
   useEffect(() => {
     const checkAdmin = async () => {
