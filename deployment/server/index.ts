@@ -84,9 +84,6 @@ app.post('/auth/login', async (c) => {
 // @ts-ignore
 app.use('/api/*', jwt({ secret: JWT_SECRET, alg: 'HS256' }));
 
-
-
-
 app.get('/api/data/:table', async (c) => {
   const table = c.req.param('table');
   const query = c.req.query();
@@ -96,7 +93,17 @@ app.get('/api/data/:table', async (c) => {
     if (query.id) {
       results = await sql`SELECT * FROM ${sql(table)} WHERE id = ${query.id}`;
     } else {
-      results = await sql`SELECT * FROM ${sql(table)} ORDER BY created_at DESC LIMIT 100`;
+      // Basic filtering support for better performance
+      const keys = Object.keys(query).filter(k => k !== 'id');
+      if (keys.length > 0) {
+        let baseQuery = sql`SELECT * FROM ${sql(table)} WHERE `;
+        keys.forEach((key, index) => {
+          baseQuery = sql`${baseQuery} ${sql(key)} = ${query[key]} ${index < keys.length - 1 ? sql`AND` : sql``}`;
+        });
+        results = await sql`${baseQuery} ORDER BY created_at DESC LIMIT 200`;
+      } else {
+        results = await sql`SELECT * FROM ${sql(table)} ORDER BY created_at DESC LIMIT 200`;
+      }
     }
     return c.json(results);
   } catch (error) {
@@ -109,6 +116,8 @@ app.post('/api/data/:table', async (c) => {
   const table = c.req.param('table');
   const body = await c.req.json();
   try {
+    // Ensure id is generated if missing
+    if (!body.id) body.id = crypto.randomUUID();
     const results = await sql`INSERT INTO ${sql(table)} ${sql(body)} RETURNING *`;
     return c.json(results[0]);
   } catch (error) {
