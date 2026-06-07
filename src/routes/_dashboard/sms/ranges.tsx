@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_dashboard/sms/ranges")({
 });
 
 function SmsRangesPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { data: ranges, isLoading } = useQuery({
     queryKey: ['sms_ranges'],
     queryFn: async () => {
@@ -29,6 +31,31 @@ function SmsRangesPage() {
       return data;
     }
   });
+
+  const filteredRanges = ranges?.filter((r: any) => 
+    r.prefix?.includes(searchTerm) || 
+    r.memo?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const handleExport = () => {
+    const headers = ["Prefix", "Test Number", "Currency", "1/1", "7/1", "7/7", "30/45", "Memo"];
+    const csvData = filteredRanges.map((r: any) => [
+      r.prefix,
+      r.test_number || '-',
+      r.currency,
+      r.payout_1_1 || 'NA',
+      r.payout_7_1,
+      r.payout_7_7 || 'NA',
+      r.payout_30_45,
+      (r.memo || '-').replace(/,/g, " ")
+    ]);
+    const csvContent = [headers, ...csvData].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Ranges_Report_${new Date().toISOString()}.csv`;
+    link.click();
+  };
 
   return (
     <div className="space-y-6">
