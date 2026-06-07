@@ -20,6 +20,8 @@ export const Route = createFileRoute("/_dashboard/sms/ratecard")({
 });
 
 function SmsRateCardPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { data: rates, isLoading } = useQuery({
     queryKey: ['sms_rates'],
     queryFn: async () => {
@@ -31,6 +33,28 @@ function SmsRateCardPage() {
       return data;
     }
   });
+
+  const filteredRates = rates?.filter((rate: any) => 
+    rate.prefix?.includes(searchTerm) || 
+    rate.memo?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const handleExport = () => {
+    const headers = ["Prefix", "Country", "Network", "Rate (USD)"];
+    const csvData = filteredRates.map((rate: any) => [
+      rate.prefix,
+      rate.memo?.split(' ')[0] || 'International',
+      rate.memo || 'All Networks',
+      `$${rate.payout_7_1 || '0.00'}`
+    ]);
+    const csvContent = [headers, ...csvData].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `RateCard_${new Date().toISOString()}.csv`;
+    link.click();
+    toast.success("Exporting RateCard");
+  };
 
   return (
     <div className="space-y-6">
