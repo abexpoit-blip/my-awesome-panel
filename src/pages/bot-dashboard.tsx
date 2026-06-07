@@ -10,19 +10,25 @@ export default function BotDashboard() {
   const [bots, setBots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchBots = async () => {
-    setLoading(true);
+  const fetchBots = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     const { data, error } = await supabase.from('bots').select('*');
     if (error) {
-      toast.error("Failed to load bots");
+      console.error("Failed to load bots:", error);
     } else {
       setBots(data || []);
     }
-    setLoading(false);
+    if (showLoading) setLoading(false);
   };
 
   useEffect(() => {
     fetchBots();
+    
+    const interval = setInterval(() => {
+      fetchBots(false);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
