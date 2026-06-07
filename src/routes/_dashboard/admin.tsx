@@ -89,8 +89,8 @@ function AdminDashboard() {
         discrepancy: discrepancy,
         status: discrepancy === 0 ? "Perfect" : (discrepancy < 10 ? "Healthy" : "Check Needed"),
         ranges: [
-          { name: "IMS SMS", scraped: logs?.filter(l => l.source === 'IMS').length || 0, matched: 0 },
-          { name: "Shark SMS", scraped: logs?.filter(l => l.source === 'SHARK').length || 0, matched: 0 }
+          { name: "IMS SMS", scraped: logs?.filter((l: any) => l.source === 'IMS').length || 0, matched: 0 },
+          { name: "Shark SMS", scraped: logs?.filter((l: any) => l.source === 'SHARK').length || 0, matched: 0 }
         ]
       });
       setIsSyncing(false);
