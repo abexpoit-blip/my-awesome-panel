@@ -26,6 +26,7 @@ function AdminDashboard() {
   const [syncResults, setSyncResults] = useState<any>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const navigate = useNavigate();
+  const { tab } = Route.useSearch<{ tab?: string }>();
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -145,7 +146,7 @@ function AdminDashboard() {
          </Card>
       )}
 
-      <Tabs defaultValue="agents" className="space-y-6">
+      <Tabs defaultValue={tab || "agents"} className="space-y-6">
         <TabsList className="bg-white border border-[#e3e6ec] p-1.5 h-14 rounded-2xl shadow-lg inline-flex w-full md:w-auto">
           <TabsTrigger value="agents" className="data-[state=active]:bg-[#0061f2] data-[state=active]:text-white font-black uppercase text-[10px] px-8 h-full rounded-xl transition-all">Agents</TabsTrigger>
           <TabsTrigger value="payouts" className="data-[state=active]:bg-[#0061f2] data-[state=active]:text-white font-black uppercase text-[10px] px-8 h-full rounded-xl transition-all">Payouts</TabsTrigger>
