@@ -125,7 +125,10 @@ app.post('/auth/login', async (c) => {
         username: user.username, 
         role: user.role || 'agent', 
         is_admin: !!user.is_admin,
-        status: user.status
+        status: user.status,
+        balance: user.balance,
+        skype_id: user.skype_id,
+        full_name: user.full_name
       }, 
       token 
     });
