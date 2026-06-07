@@ -2,5 +2,5 @@
 # Commands to push your local changes to the new GitHub repo
 
 git add .
-git commit -m "Fix: Add legacy-peer-deps to frontend Dockerfile to resolve nitro version conflict"
+git commit -m "Performance: Fix login logic, optimize Nginx, and add robust deployment script"
 git push origin main
