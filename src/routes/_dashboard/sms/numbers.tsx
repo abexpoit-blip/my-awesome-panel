@@ -61,19 +61,38 @@ function SmsNumbersPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold text-[#2b3a4a]">SMS Numbers</h1>
+        <h1 className="text-2xl font-bold text-[#2b3a4a]">SMS Numbers Inventory</h1>
       </div>
 
       <Card className="shadow-sm border-[#e3e6ec]">
         <CardContent className="p-6">
           <div className="flex flex-wrap gap-2 mb-6 border-b border-[#e3e6ec] pb-6">
-            <Button variant="outline" size="sm" className="bg-[#0061f2] text-white hover:bg-[#0052ce] border-none px-4 font-bold text-[10px] uppercase tracking-wider">Copy</Button>
-            <Button variant="outline" size="sm" className="bg-[#0061f2] text-white hover:bg-[#0052ce] border-none px-4 font-bold text-[10px] uppercase tracking-wider">CSV</Button>
-            <Button variant="outline" size="sm" className="bg-[#0061f2] text-white hover:bg-[#0052ce] border-none px-4 font-bold text-[10px] uppercase tracking-wider">Excel</Button>
+            <Button onClick={handleExport} variant="outline" size="sm" className="bg-[#0061f2] text-white hover:bg-[#0052ce] border-none px-4 font-bold text-[10px] uppercase tracking-wider">CSV</Button>
+            <Button onClick={handleExport} variant="outline" size="sm" className="bg-[#0061f2] text-white hover:bg-[#0052ce] border-none px-4 font-bold text-[10px] uppercase tracking-wider">Excel</Button>
             
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-xs font-bold text-[#69707a] uppercase tracking-wider">Search:</span>
-              <Input className="w-48 h-8 border-[#c5ccd6] focus:border-[#0061f2] focus:ring-0 text-xs" />
+            <div className="ml-auto flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase text-[#69707a]">Service:</span>
+                <select 
+                  value={filterRange}
+                  onChange={(e) => setFilterRange(e.target.value)}
+                  className="h-8 border border-[#c5ccd6] rounded-md px-2 text-xs focus:ring-1 focus:ring-[#0061f2] outline-none"
+                >
+                  <option>All Ranges</option>
+                  <option>Facebook</option>
+                  <option>WhatsApp</option>
+                  <option>Telegram</option>
+                  <option>Google</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase text-[#69707a]">Search:</span>
+                <Input 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-48 h-8 border-[#c5ccd6] focus:border-[#0061f2] focus:ring-0 text-xs" 
+                />
+              </div>
             </div>
           </div>
 
