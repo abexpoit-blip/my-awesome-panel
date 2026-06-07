@@ -274,10 +274,16 @@ export function BotsTab() {
                               <span className="text-[10px] font-bold">Auto-Refresh (15s)</span>
                               <Checkbox checked onCheckedChange={(checked) => updateBotSetting('shark_auto_refresh', String(checked), bots.find(b => b.bot_type === 'shark')?.id)} />
                           </div>
-                          <div className="space-y-1 pt-2">
-                             <Label className="text-[10px] font-bold">Session Timeout (min)</Label>
-                             <Input type="number" defaultValue="60" className="h-8 text-xs" onChange={(e) => updateBotSetting('shark_session_timeout', e.target.value, bots.find(b => b.bot_type === 'shark')?.id)} />
-                          </div>
+                             <div className="space-y-1 pt-2">
+                                <Label className="text-[10px] font-bold">Session Timeout (min)</Label>
+                                <Input 
+                                  type="number" 
+                                  defaultValue={botSettings.find(s => s.setting_key === 'shark_session_timeout')?.setting_value || '60'} 
+                                  className="h-8 text-xs" 
+                                  onChange={(e) => updateBotSetting('shark_session_timeout', e.target.value, bots.find(b => b.bot_type === 'shark')?.id)} 
+                                />
+                             </div>
+
                         </div>
                     </div>
 
@@ -331,8 +337,14 @@ export function BotsTab() {
                         </div>
                         <div className="space-y-1">
                           <Label className="text-[10px] font-bold">Timeout (min)</Label>
-                          <Input type="number" defaultValue="30" className="h-8 text-xs" onChange={(e) => updateBotSetting('ims_session_timeout', e.target.value, bots.find(b => b.bot_type === 'ims')?.id)} />
+                          <Input 
+                            type="number" 
+                            defaultValue={botSettings.find(s => s.setting_key === 'ims_session_timeout')?.setting_value || '30'} 
+                            className="h-8 text-xs" 
+                            onChange={(e) => updateBotSetting('ims_session_timeout', e.target.value, bots.find(b => b.bot_type === 'ims')?.id)} 
+                          />
                         </div>
+
                       </div>
                     </div>
                     <div className="flex items-end">
