@@ -53,7 +53,7 @@ function ClientLayout() {
       }
       setProfile(prof);
     })();
-  }, [navigate]);
+  }, [location.pathname]);
 
   const menuItems: any[] = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/client/dashboard" },

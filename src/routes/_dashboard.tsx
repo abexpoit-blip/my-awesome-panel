@@ -93,7 +93,7 @@ function DashboardLayout() {
 
   useEffect(() => {
     checkUser();
-  }, [navigate]);
+  }, [location.pathname]); // Change dependency to location.pathname to re-verify on route change
 
   // Listen for storage changes (impersonation)
   useEffect(() => {
