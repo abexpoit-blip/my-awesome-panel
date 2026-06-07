@@ -64,7 +64,7 @@ function SmsNumbersPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-10 text-gray-500 text-sm italic">Loading numbers...</TableCell>
+                    <TableCell colSpan={5} className="text-center py-10 text-gray-500 text-sm italic">Loading numbers...</TableCell>
                   </TableRow>
                 ) : !numbers || numbers.length === 0 ? (
                   <TableRow>
@@ -72,7 +72,7 @@ function SmsNumbersPage() {
                   </TableRow>
                 ) : (
                   numbers.map((num: any) => (
-                    <TableRow key={idx} className="border-b border-[#f2f4f8] hover:bg-gray-50 transition-colors">
+                    <TableRow key={num.id} className="border-b border-[#f2f4f8] hover:bg-gray-50 transition-colors">
                       <TableCell className="text-xs font-bold text-[#2b3a4a] py-3 border-r border-[#e3e6ec]">{num.number}</TableCell>
                       <TableCell className="text-xs text-[#69707a] py-3 border-r border-[#e3e6ec]">{num.service_tag || 'Global'}</TableCell>
                       <TableCell className="py-3 border-r border-[#e3e6ec]">
