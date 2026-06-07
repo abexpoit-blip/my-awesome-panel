@@ -166,7 +166,7 @@ app.get('/api/data/:table', async (c) => {
         baseQuery = sql`${baseQuery} WHERE `;
         keys.forEach((key, index) => {
           // Handle some common relationship patterns or special filters
-          if (query[key].includes('%')) {
+          if (query[key].startsWith('%') || query[key].endsWith('%')) {
              baseQuery = sql`${baseQuery} ${sql(key)} ILIKE ${query[key]} ${index < keys.length - 1 ? sql`AND` : sql``}`;
           } else {
              baseQuery = sql`${baseQuery} ${sql(key)} = ${query[key]} ${index < keys.length - 1 ? sql`AND` : sql``}`;

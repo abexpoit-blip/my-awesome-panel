@@ -115,6 +115,14 @@ function createSupabaseClient() {
                    } catch (e: any) {
                      return { error: { message: e.message } };
                    }
+                },
+                in: async (col: string, vals: any[]) => {
+                   return Promise.all(vals.map(id => {
+                      return fetch(`${API_URL}/api/data/${table}?id=${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('nexus_token')}` }
+                      });
+                   })).then(() => ({ error: null }));
                 }
              };
           },
