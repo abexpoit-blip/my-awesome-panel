@@ -112,12 +112,12 @@ function SmsNumbersPage() {
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-10 text-gray-500 text-sm italic">Loading numbers...</TableCell>
                   </TableRow>
-                ) : !numbers || numbers.length === 0 ? (
+                ) : filteredNumbers?.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10 text-gray-500 text-sm italic">No numbers found</TableCell>
+                    <TableCell colSpan={5} className="text-center py-10 text-gray-500 text-sm italic">No matching numbers found</TableCell>
                   </TableRow>
                 ) : (
-                  numbers.map((num: any) => (
+                  filteredNumbers.map((num: any) => (
                     <TableRow key={num.id} className="border-b border-[#f2f4f8] hover:bg-gray-50 transition-colors">
                       <TableCell className="text-xs font-bold text-[#2b3a4a] py-3 border-r border-[#e3e6ec]">{num.number}</TableCell>
                       <TableCell className="text-xs text-[#69707a] py-3 border-r border-[#e3e6ec]">{num.service_tag || 'Global'}</TableCell>
