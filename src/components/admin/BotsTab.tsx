@@ -119,7 +119,7 @@ export function BotsTab() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchData();
+      if (typeof fetchData === 'function') fetchData();
     }, 10000);
     return () => clearInterval(interval);
   }, []);
